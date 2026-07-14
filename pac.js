@@ -100,6 +100,29 @@ class Block {
             const wall = new Block(wallImage, x, y, tileSize, tileSize);
             walls.add(wall);
          }
+         else if(tileMapChar == 'P'){
+            pacman = new Block(right, x, y, tileSize, tileSize);   
+         }
+         else if(tileMapChar == 'b'){
+            const blueGhost = new Block(blue, x, y, tileSize,tileSize);
+            ghosts.add(blueGhost);
+         }
+         else if(tileMapChar == 'p'){
+            const pinkGhost = new Block(pink, x, y, tileSize,tileSize);
+            ghosts.add(pinkGhost);
+         }
+         else if(tileMapChar == 'o'){
+            const orangeGhost = new Block(orange, x, y, tileSize,tileSize);
+            ghosts.add(orangeGhost);
+         }
+          else if(tileMapChar == 'r'){
+            const redGhost = new Block(red, x, y, tileSize,tileSize);
+            ghosts.add(redGhost);
+         }
+          else if(tileMapChar == ' '){
+            const food = new Block(null, x + 14, y + 14, 4, 4);
+            foods.add(food);
+         }
       }
    }
  }
@@ -111,5 +134,104 @@ class Block {
     loadImages();
     loadMap();
     console.log(walls.size);
+    update();
+
     
  }
+
+ function update() {
+   move();
+   draw();
+   setTimeout(update,50);
+ }
+
+ function draw(){
+   ctx.clearRect(0, 0, canvas.width, canvas.height);
+   ctx.drawImage(pacman.image, pacman.x, pacman.y, pacman.width, pacman.height);
+   for(let wall of walls.values()){
+      ctx.drawImage(wall.image, wall.x, wall.y, wall.width, wall.height);
+
+   }
+   for(let ghost of ghosts.values()){
+      ctx.drawImage(ghost.image, ghost.x, ghost.y, ghost.width, ghost.height);
+
+   }
+   ctx.fillStyle = "white";
+   for(let food of foods.values()){
+      ctx.fillRect(food.x, food.y, food.width, food.height);
+
+   }
+
+ }
+let rightPress;
+let leftPress;
+let upPress;
+let downPress;
+let direction;
+ function move(){
+   if(rightPress && pacman.x < canvas.width-pacman.width){
+      pacman.x += 10
+      direction = "R";
+   }
+   if(leftPress && pacman.x > 0){
+      pacman.x -= 10
+      direction = "L";
+   }
+   if(upPress && pacman.y > 0){
+      pacman.y -= 10;
+      direction = "U";
+   }
+   if(downPress && pacman.y < canvas.height - pacman.height){
+      pacman.y += 10;
+      direction = "D";
+   }
+
+   if(direction == "U"){
+      pacman.image = up;
+   }
+   if(direction == "R"){
+      pacman.image = right;
+   }
+   if(direction == "L"){
+      pacman.image = left;
+   }
+   if(direction == "D"){
+      pacman.image = down;
+   }
+
+ }
+
+ document.addEventListener("keydown", (event) => {
+
+  if (event.code === "ArrowRight") {
+    rightPress = true;
+  }
+  if (event.code === "ArrowLeft") {
+    leftPress = true;
+  }
+  if (event.code === "ArrowUp") {
+    upPress = true;
+  }
+  if (event.code === "ArrowDown") {
+    downPress = true;
+  }
+
+  
+});
+
+// when we lift up from our key, we set our variables to false
+document.addEventListener("keyup", (event) => {
+  if (event.code === "ArrowRight") {
+    rightPress = false;
+  }
+  if (event.code === "ArrowLeft") {
+    leftPress = false;
+  }
+  if (event.code === "ArrowUp") {
+    upPress = false;
+  }
+  if (event.code === "ArrowDown") {
+    downPress = false;
+  }
+  
+})
