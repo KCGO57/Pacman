@@ -8,6 +8,8 @@ let ctx;
  const width = columnCount * tileSize;
  const height = rowCount* tileSize;
 
+
+
  let blue;
  let orange;
  let pink;
@@ -48,22 +50,25 @@ const foods = new Set();
 const ghosts = new Set();
 let pacman;
 
-class Block {
-   constructor(image, x, y, width, height) {
-      this.image = image;
-      this.x = x;
-      this.y = y;
-      this.width = width;
-      this.height = height;
-      this.startX = x; // save starting x and y position of pacman and the ghost
-      this.startY = y; 
+ const directions = ["U", "D", "L", "R"];
+ window.onload = function() {
+    canvas = document.getElementById("canvas");
+    canvas.height = height;
+    canvas.width = width;
+    ctx = canvas.getContext("2d");
+    loadImages();
+    loadMap();
+    console.log(walls.size);
+    update();
+    for(let ghost of ghosts.values()){
+      const newDirection = directions[Math.floor(Math.random()*4)];
+      ghost.updateDirection(newDirection);
+    }
 
-      this.velocityX = 0;
-      this.velocityY = 0;
+    
+ }
 
-   }
-}
- function loadImages(){
+function loadImages(){
    blue = new Image();
    blue.src = "./Art/blueGhost.png";
    orange = new Image();
@@ -129,18 +134,52 @@ class Block {
       }
    }
  }
- window.onload = function() {
-    canvas = document.getElementById("canvas");
-    canvas.height = height;
-    canvas.width = width;
-    ctx = canvas.getContext("2d");
-    loadImages();
-    loadMap();
-    console.log(walls.size);
-    update();
 
-    
- }
+
+class Block {
+   constructor(image, x, y, width, height) {
+      this.image = image;
+      this.x = x;
+      this.y = y;
+      this.width = width;
+      this.height = height;
+      this.startX = x; // save starting x and y position of pacman and the ghost
+      this.startY = y; 
+
+      this.velocityX = 0;
+      this.velocityY = 0;
+
+   }
+   updateDirection(direction){
+      const pDirection = this.direction;
+      this.direction = direction;
+      this.updateVelocity();
+      this.x += this.velocityX;
+      this.y += this.velocityY;
+   }
+   updateVelocity(){
+      if(this.direction == "U"){
+         this.velocityX = 0;
+         this.velocityY = -tileSize/4;
+      }
+      else if(this.direction == "D"){
+         this.velocityX = 0;
+         this.velocityY = tileSize/4;
+      }
+      else if(this.direction == "L"){
+         this.velocityX = -tileSize/4;
+         this.velocityY = 0;
+
+      }
+      else if(this.direction == "R"){
+         this.velocityX = tileSize/4;
+         this.velocityY = 0;
+      }
+   }
+}
+ 
+
+
 
  function update() {
    move();
@@ -170,7 +209,9 @@ let rightPress;
 let leftPress;
 let upPress;
 let downPress;
+
 let direction;
+
  function move(){
    if(rightPress && pacman.x < canvas.width-pacman.width){
       pacman.x += 10
@@ -225,6 +266,10 @@ let direction;
             }
             }
          }
+      for(let ghost of ghosts.values()){
+         ghost.x += ghost.velocityX;
+         ghost.y += ghost.velocityY;
+      }
  }
 
  function collision(a, b){
