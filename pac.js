@@ -58,6 +58,9 @@ class Block {
       this.startX = x; // save starting x and y position of pacman and the ghost
       this.startY = y; 
 
+      this.velocityX = 0;
+      this.velocityY = 0;
+
    }
 }
  function loadImages(){
@@ -84,7 +87,7 @@ class Block {
 
  }
 
- function loadMap(){ // iterate through our map and create block objects
+ function loadMap(){ // iterate through our map and create block is
    walls.clear();
    foods.clear();
    ghosts.clear();
@@ -198,9 +201,39 @@ let direction;
    if(direction == "D"){
       pacman.image = down;
    }
-
+   for(let i of walls.values()){
+      if(collision(pacman, i)){
+         let top = Math.abs(pacman.y - (i.y + i.height)); // player top obj bottom
+         let right = Math.abs((pacman.x + pacman.width) - i.x); // player right obj left
+         let left = Math.abs((pacman.x-(i.x+i.width)));//etc
+         let bottom = Math.abs((pacman.y + pacman.height) - i.y); //etc
+  
+         if ((pacman.y <= i.y + i.height && pacman.y + pacman.height > i.y + i.height) && (top < right&& top < left)){
+            pacman.y = i.y + i.height;
+            //pacman.yVelocity = 0;
+         }
+         if((pacman.y + pacman.height >= i.y && pacman.y < i.y) && (bottom < right && bottom < left)){
+               pacman.y = i.y - pacman.height; 
+             //  pacman.jumping = false;
+              // pacman.yVelocity = 0;
+         }
+         if((pacman.x + pacman.width >= i.x && pacman.x < i.x) && (right < top && right < bottom)){
+            pacman.x = i.x - pacman.width;
+            }
+          if((pacman.x <= i.x + i.width && pacman.x + pacman.width > i.x + i.width) && (left < top && left < bottom)){
+               pacman.x = i.x + i.width;
+            }
+            }
+         }
  }
 
+ function collision(a, b){
+   return a.x + a.width >= b.x && 
+          a.x <= b.width + b.x&&
+          a.y + a.height >= b.y && 
+          a.y <= b.y + b.height
+
+ }
  document.addEventListener("keydown", (event) => {
 
   if (event.code === "ArrowRight") {
