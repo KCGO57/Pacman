@@ -51,6 +51,10 @@ const ghosts = new Set();
 let pacman;
 
  const directions = ["U", "D", "L", "R"];
+
+ let score = 0;
+ let lives = 3;
+ let gameOver = false;
  window.onload = function() {
     canvas = document.getElementById("canvas");
     canvas.height = height;
@@ -58,12 +62,12 @@ let pacman;
     ctx = canvas.getContext("2d");
     loadImages();
     loadMap();
-    console.log(walls.size);
-    update();
+    
     for(let ghost of ghosts.values()){
       const newDirection = directions[Math.floor(Math.random()*4)];
       ghost.updateDirection(newDirection);
     }
+    update();
 
     
  }
@@ -156,6 +160,15 @@ class Block {
       this.updateVelocity();
       this.x += this.velocityX;
       this.y += this.velocityY;
+      for (let wall of walls.values()) {
+            if (collision(this, wall)) {
+                this.x -= this.velocityX;
+                this.y -= this.velocityY;
+                this.direction = pDirection;
+                this.updateVelocity();
+                return;
+            }
+      }
    }
    updateVelocity(){
       if(this.direction == "U"){
@@ -242,6 +255,7 @@ let direction;
    if(direction == "D"){
       pacman.image = down;
    }
+   
    for(let i of walls.values()){
       if(collision(pacman, i)){
          let top = Math.abs(pacman.y - (i.y + i.height)); // player top obj bottom
@@ -267,10 +281,30 @@ let direction;
             }
          }
       for(let ghost of ghosts.values()){
-         ghost.x += ghost.velocityX;
-         ghost.y += ghost.velocityY;
+        ghost.x += ghost.velocityX;
+        ghost.y += ghost.velocityY;
+         
+         for(let i of walls.values()){
+            if(collision(ghost, i)){
+
+               ghost.x -= ghost.velocityX;
+               ghost.y -= ghost.velocityY;
+               const newDirection = directions[Math.floor(Math.random()*4)];
+               ghost.updateDirection(newDirection);
+            }
+         }
       }
+      let foodEaten = null;
+      for(let food of foods.values()){
+         if(collision(pacman, food)){
+            foodEaten = food;
+            score += 10;
+            break;
+         }
+      }
+      foods.delete(foodEaten);
  }
+  
 
  function collision(a, b){
    return a.x + a.width >= b.x && 
