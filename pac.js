@@ -1,8 +1,9 @@
 let canvas; 
 let ctx;
 
- const rowCount = 21;
- const columnCount = 19;
+//-------------------------------------------------Creation of Map----------------------------------------------------------------------------------------------------
+ const rowCount = 24;
+ const columnCount = 25;
  const tileSize = 32;
 
  const width = columnCount * tileSize;
@@ -22,55 +23,31 @@ let ctx;
  let wall;
 
  const tileMap = [
-    "XXXXXXXXXXXXXXXXXXX",
-    "X        X        X",
-    "X XX XXX X XXX XX X",
-    "X                 X",
-    "X XX X XXXXX X XX X",
-    "X    X       X    X",
-    "XXXX XXXX XXXX XXXX",
-    "OOOX X       X XOOO",
-    "XXXX X XXrXX X XXXX",
-    "O       bpo       O",
-    "XXXX X XXXXX X XXXX",
-    "OOOX X       X XOOO",
-    "XXXX X XXXXX X XXXX",
-    "X        X        X",
-    "X XX XXX X XXX XX X",
-    "X  X     P     X  X",
-    "XX X X XXXXX X X XX",
-    "X    X   X   X    X",
-    "X XXXXXX X XXXXXX X",
-    "X                 X",
-    "XXXXXXXXXXXXXXXXXXX" 
+    "XXXXXXXXXXXX0XXXXXXXXXXXX",
+    "X          X0X          X",
+    "X  XXXX X  X0X XXXX  X  X",
+    "X  XXXX X  XXX XXXX  X  X",
+    "                        X",
+    "X  XXXX  X XXX X  XXXX  X",
+    "XXXX  X  X XXX X  X  XXXX",
+    "X     X  X  r  X  X     X",
+    "X        XXbpoXX        X",
+    "X                       X",
+    "XXXX    X XXXXX X    XXXX",
+    "OOO0    X       X    0000",
+    "XXXX    X XXXXX X    XXXX",
+    "X       X       X       X",
+    "X XX XXXX  XXX     XXXXXXX",
+    "X  X X      P      X    X",
+    "XX X X   XXXXXXX   X XX X",
+    "X    X   X     X   X    X",
+    "X                       X ",
+    "X    X            X     X",
+    "X    X   XXXXXXX  X     X",
+    "X  XXXX     X    XXXXX  X",
+    "X                       X",
+    "XXXXXXXXXXXXXXXXXXXXXXXXX" 
 ];
-
-const walls = new Set(); 
-const foods = new Set();
-const ghosts = new Set();
-let pacman;
-
- const directions = ["U", "D", "L", "R"];
-
- let score = 0;
- let lives = 3;
- let gameOver = false;
- window.onload = function() {
-    canvas = document.getElementById("canvas");
-    canvas.height = height;
-    canvas.width = width;
-    ctx = canvas.getContext("2d");
-    loadImages();
-    loadMap();
-    
-    for(let ghost of ghosts.values()){
-      const newDirection = directions[Math.floor(Math.random()*4)];
-      ghost.updateDirection(newDirection);
-    }
-    update();
-
-    
- }
 
 function loadImages(){
    blue = new Image();
@@ -95,11 +72,15 @@ function loadImages(){
    wallImage.src = "./Art/wall.png";
 
  }
+const walls = new Set(); 
+const foods = new Set();
+const ghosts = new Set();
+let pacman;
 
  function loadMap(){ // iterate through our map and create block is
-   walls.clear();
-   foods.clear();
-   ghosts.clear();
+   //walls.clear();
+   //foods.clear();
+   //ghosts.clear();
    for(let i = 0; i< rowCount; i++){
       for(let j = 0; j < columnCount; j++){
          const row = tileMap[i];
@@ -138,6 +119,60 @@ function loadImages(){
       }
    }
  }
+ 
+function draw(){
+   ctx.clearRect(0, 0, canvas.width, canvas.height);
+   ctx.drawImage(pacman.image, pacman.x, pacman.y, pacman.width, pacman.height);
+   for(let wall of walls.values()){
+      ctx.drawImage(wall.image, wall.x, wall.y, wall.width, wall.height);
+
+   }
+   for(let ghost of ghosts.values()){
+      ctx.drawImage(ghost.image, ghost.x, ghost.y, ghost.width, ghost.height);
+
+   }
+   ctx.fillStyle = "white";
+   for(let food of foods.values()){
+      ctx.fillRect(food.x, food.y, food.width, food.height);
+
+   }
+
+ }
+
+//----------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+
+
+
+
+
+
+
+ const directions = ["U", "D", "L", "R"];
+
+ let score = 0;
+ let lives = 3;
+ let gameOver = false;
+ window.onload = function() {
+    canvas = document.getElementById("canvas");
+    canvas.height = height;
+    canvas.width = width;
+    ctx = canvas.getContext("2d");
+    loadImages();
+    loadMap();
+    
+    for(let ghost of ghosts.values()){
+      const newDirection = directions[Math.floor(Math.random()*4)];
+      ghost.updateDirection(newDirection);
+    }
+    update();
+
+    
+ }
+
+
+
 
 
 class Block {
@@ -200,24 +235,8 @@ class Block {
    setTimeout(update,50);
  }
 
- function draw(){
-   ctx.clearRect(0, 0, canvas.width, canvas.height);
-   ctx.drawImage(pacman.image, pacman.x, pacman.y, pacman.width, pacman.height);
-   for(let wall of walls.values()){
-      ctx.drawImage(wall.image, wall.x, wall.y, wall.width, wall.height);
+ 
 
-   }
-   for(let ghost of ghosts.values()){
-      ctx.drawImage(ghost.image, ghost.x, ghost.y, ghost.width, ghost.height);
-
-   }
-   ctx.fillStyle = "white";
-   for(let food of foods.values()){
-      ctx.fillRect(food.x, food.y, food.width, food.height);
-
-   }
-
- }
 let rightPress;
 let leftPress;
 let upPress;
@@ -318,13 +337,13 @@ let direction;
   if (event.code === "ArrowRight") {
     rightPress = true;
   }
-  if (event.code === "ArrowLeft") {
+  else if (event.code === "ArrowLeft") {
     leftPress = true;
   }
-  if (event.code === "ArrowUp") {
+  else if (event.code === "ArrowUp") {
     upPress = true;
   }
-  if (event.code === "ArrowDown") {
+  else if (event.code === "ArrowDown") {
     downPress = true;
   }
 
@@ -336,13 +355,13 @@ document.addEventListener("keyup", (event) => {
   if (event.code === "ArrowRight") {
     rightPress = false;
   }
-  if (event.code === "ArrowLeft") {
+  else if (event.code === "ArrowLeft") {
     leftPress = false;
   }
-  if (event.code === "ArrowUp") {
+  else if (event.code === "ArrowUp") {
     upPress = false;
   }
-  if (event.code === "ArrowDown") {
+  else if (event.code === "ArrowDown") {
     downPress = false;
   }
   
